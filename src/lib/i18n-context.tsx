@@ -1,0 +1,162 @@
+'use client';
+
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+
+type Language = 'en' | 'zh';
+
+interface Translations {
+    [key: string]: {
+        en: string;
+        zh: string;
+    };
+}
+
+const translations: Translations = {
+    // Navigation
+    'nav.home': { en: 'Home', zh: '首页' },
+    'nav.imageToPoints': { en: 'Image to Points', zh: '图像转点云' },
+    'nav.pointsToImage': { en: 'Points to Image', zh: '点云转图像' },
+
+    // Home
+    'home.hero.title': { en: 'Image ToolKit', zh: '图像处理工具箱' },
+    'home.hero.subtitle': { en: 'Professional Image Processing & Analysis', zh: '专业图像处理与分析' },
+    'home.hero.description': { en: 'Convert images to grayscale, analyze pixel distributions, and visualize 3D point clouds. All in your browser.', zh: '将图像转换为灰度，分析像素分布，并在浏览器中可视化3D点云。' },
+    'home.features.grayscale': { en: 'Grayscale Conversion', zh: '灰度转换' },
+    'home.features.grayscale.desc': { en: 'Convert images to high-quality grayscale with precise algorithms.', zh: '使用精确算法将图像转换为高质量灰度图。' },
+    'home.features.analysis': { en: 'Region Analysis', zh: '区域分析' },
+    'home.features.analysis.desc': { en: 'Select and analyze specific image regions for detailed statistics.', zh: '选择并分析特定图像区域以获取详细统计数据。' },
+    'home.features.3d': { en: '3D Visualization', zh: '3D 可视化' },
+    'home.features.3d.desc': { en: 'View your image data as interactive 3D point clouds surfaces.', zh: '将图像数据作为交互式3D点云表面查看。' },
+    // Home Cards & Workflow
+    'home.card.i2p.title': { en: 'Image to Points', zh: '图像转点云' },
+    'home.card.i2p.desc': { en: 'Convert images to grayscale, analyze regions, and export point cloud data', zh: '将图像转换为灰度，分析区域数据并导出点云' },
+    'home.card.p2i.title': { en: 'Points to Image', zh: '点云转图像' },
+    'home.card.p2i.desc': { en: 'Convert point cloud data back to grayscale images with 3D visualization', zh: '将点云数据转换回灰度图像并进行3D可视化' },
+    'home.workflow.title': { en: 'Seamless Workflow', zh: '无缝工作流程' },
+    'home.workflow.upload': { en: 'Upload Image', zh: '上传图像' },
+    'home.workflow.analyze': { en: 'Analyze Regions', zh: '区域分析' },
+    'home.workflow.3d': { en: '3D Visualization', zh: '3D 可视化' },
+
+    // Image to Points
+    'i2p.title': { en: 'Image → Point Cloud', zh: '图像 → 点云' },
+    'i2p.description': { en: 'Convert images to grayscale, analyze regions, and export point cloud data', zh: '将图像转换为灰度，分析区域并导出点云数据' },
+    'i2p.upload.title': { en: 'Upload Image', zh: '上传图像' },
+    'i2p.upload.desc': { en: 'Drag and drop or click to upload', zh: '拖放或点击上传' },
+    'i2p.upload.cardDesc': { en: 'Select an image to convert to grayscale', zh: '选择需转换的图像' },
+    'i2p.grayscale.title': { en: 'Grayscale Image', zh: '灰度图像' },
+    'i2p.grayscale.desc': { en: 'Region selection and analysis', zh: '区域选择与分析' },
+    'i2p.common.save': { en: 'Save', zh: '保存' },
+    'i2p.common.newImage': { en: 'New Image', zh: '新图像' },
+    'i2p.export.title': { en: 'Export Data', zh: '导出数据' },
+    'i2p.regions.title': { en: 'Regions', zh: '区域' },
+    'i2p.regions.desc': { en: 'Click regions on canvas to analyze', zh: '点击画布上的区域进行分析' },
+    'i2p.regions.noData': { en: 'No regions selected. Draw rectangles on the image to create analysis regions.', zh: '未选择区域。在图像上绘制矩形以创建分析区域。' },
+    'i2p.region.label': { en: 'Region', zh: '区域' },
+    'i2p.region.position': { en: 'Position', zh: '位置' },
+    'i2p.region.size': { en: 'Size', zh: '尺寸' },
+    'i2p.analysis.title': { en: 'Analysis Results', zh: '分析结果' },
+    'i2p.analysis.noData': { en: 'No region selected. Draw a rectangle on the image to analyze.', zh: '未选择区域。在图像上绘制矩形进行分析。' },
+    'i2p.export.excel': { en: 'Export Excel', zh: '导出 Excel' },
+    'i2p.export.separate': { en: 'Export Separate Files', zh: '导出独立文件' },
+    'i2p.stats.region': { en: 'Region', zh: '区域' },
+    'i2p.stats.mean': { en: 'Mean', zh: '平均值' },
+    'i2p.stats.median': { en: 'Median', zh: '中位数' },
+    'i2p.stats.stdDev': { en: 'Std Dev', zh: '标准差' },
+    'i2p.stats.min': { en: 'Min', zh: '最小值' },
+    'i2p.stats.max': { en: 'Max', zh: '最大值' },
+    'i2p.stats.range': { en: 'Range', zh: '范围' },
+    'i2p.chart.profile': { en: 'Pixel Profile View', zh: '像素剖面视图' },
+    'i2p.chart.distribution': { en: 'Grayscale Distribution', zh: '灰度分布' },
+
+    // Points to Image
+    'p2i.title': { en: 'Point Cloud → Image', zh: '点云 → 图像' },
+    'p2i.description': { en: 'Import CSV/Excel point cloud data and convert to grayscale images with 3D visualization', zh: '导入CSV/Excel点云数据并转换为具有3D可视化的灰度图像' },
+    'p2i.import.title': { en: 'Import Point Cloud Data', zh: '导入点云数据' },
+    'p2i.import.desc': { en: 'Upload CSV or Excel file with X, Y, Grayscale columns', zh: '上传包含X、Y、灰度列的CSV或Excel文件' },
+    'p2i.processing': { en: 'Processing file...', zh: '正在处理文件...' },
+    'p2i.generated.title': { en: 'Generated Image', zh: '生成图像' },
+    'p2i.common.newFile': { en: 'New File', zh: '新文件' },
+    'p2i.view.2d': { en: '2D Image', zh: '2D 图像' },
+    'p2i.view.3d': { en: '3D View', zh: '3D 视图' },
+    'p2i.info.title': { en: 'File Information', zh: '文件信息' },
+    'p2i.info.filename': { en: 'Filename', zh: '文件名' },
+    'p2i.info.totalPoints': { en: 'Total Points', zh: '总点数' },
+    'p2i.info.xRange': { en: 'X Range', zh: 'X 范围' },
+    'p2i.info.yRange': { en: 'Y Range', zh: 'Y 范围' },
+    'p2i.req.title': { en: 'Format Requirements', zh: '格式要求' },
+    'p2i.req.columns': { en: 'Required Columns:', zh: '必需列：' },
+    'p2i.req.col.x': { en: 'Horizontal coordinate', zh: '水平坐标' },
+    'p2i.req.col.y': { en: 'Vertical coordinate', zh: '垂直坐标' },
+    'p2i.req.col.gray': { en: 'Value (0-255)', zh: '值 (0-255)' },
+    'p2i.req.example': { en: 'Example:', zh: '示例：' },
+
+    // Common Components
+    'comp.upload.dragDrop': { en: 'Drag and drop files here, or click to browse', zh: '拖放文件到此处，或点击浏览' },
+    'comp.upload.supports': { en: 'Supports', zh: '支持' },
+    'comp.upload.loading': { en: 'Loading...', zh: '加载中...' },
+    'comp.chart.analyzing': { en: 'Analyzing...', zh: '正在分析...' },
+    'comp.chart.gray': { en: 'Grayscale', zh: '灰度' },
+    'comp.chart.grayscaleDist': { en: 'Grayscale Distribution', zh: '灰度分布' },
+    'comp.chart.pixelIndex': { en: 'Pixel Index', zh: '像素索引' },
+    'comp.chart.count': { en: 'Count', zh: '数量' },
+    'comp.chart.points': { en: 'Points', zh: '点数' },
+
+    // Home Stats & Features
+    'home.stats.grayLevels': { en: 'Gray Levels', zh: '灰度级' },
+    'home.stats.exportFormats': { en: 'Export Formats', zh: '导出格式' },
+    'home.stats.3dView': { en: '3D View', zh: '3D 视图' },
+    'home.tag.grayscale': { en: 'Grayscale', zh: '灰度' },
+    'home.tag.region': { en: 'Region', zh: '区域' },
+    'home.tag.histogram': { en: 'Histogram', zh: '直方图' },
+    'home.tag.export': { en: 'Export', zh: '导出' },
+    'home.tag.import': { en: 'Import', zh: '导入' },
+    'home.tag.generate': { en: 'Generate', zh: '生成' },
+    'home.tag.3dView': { en: '3D View', zh: '3D 视图' },
+
+    'home.start': { en: 'Get Started', zh: '开始使用' },
+
+    // 3D Viewer Controls
+    '3d.mode': { en: 'Render Mode', zh: '渲染模式' },
+    '3d.grid': { en: 'Toggle Grid', zh: '网格开关' },
+    '3d.colormap': { en: 'Color Map', zh: '色彩映射' },
+    '3d.pulse': { en: 'Pulse Animation', zh: '脉冲动画' },
+    '3d.screenshot': { en: 'Screenshot', zh: '截图' },
+    '3d.reset': { en: 'Reset View', zh: '重置视图' },
+    '3d.rotate': { en: 'Auto Rotate', zh: '自动旋转' },
+    '3d.height': { en: 'Height Scale', zh: '高度缩放' },
+    '3d.canvas.reset': { en: 'Reset Canvas', zh: '重置画布' },
+
+    // Settings
+    'settings.language': { en: 'Language', zh: '语言' },
+    'settings.theme': { en: 'Theme', zh: '主题' },
+};
+
+interface I18nContextType {
+    language: Language;
+    setLanguage: (lang: Language) => void;
+    t: (key: string) => string;
+}
+
+const I18nContext = createContext<I18nContextType | undefined>(undefined);
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+    const [language, setLanguage] = useState<Language>('zh'); // Default to Chinese as per request context implies Chinese user
+
+    const t = (key: string) => {
+        return translations[key]?.[language] || key;
+    };
+
+    return (
+        <I18nContext.Provider value={{ language, setLanguage, t }}>
+            {children}
+        </I18nContext.Provider>
+    );
+}
+
+export function useI18n() {
+    const context = useContext(I18nContext);
+    if (context === undefined) {
+        throw new Error('useI18n must be used within a I18nProvider');
+    }
+    return context;
+}
