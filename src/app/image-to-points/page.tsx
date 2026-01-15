@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Download, Trash2, FileSpreadsheet, Image as ImageIcon } from 'lucide-react';
+import { Download, Trash2, FileSpreadsheet, Image as ImageIcon, ImageUp } from 'lucide-react';
 import {
     loadImageFromFile,
     getImageData,
@@ -251,6 +251,7 @@ export default function ImageToPointsPage() {
                                                     setSelectedRegionId(undefined);
                                                 }}
                                             >
+                                                <ImageUp className="w-4 h-4 mr-2" />
                                                 {t('i2p.common.newImage')}
                                             </Button>
                                         </div>
