@@ -107,6 +107,7 @@ const translations: Translations = {
     '3d.height': { en: 'Height Scale', zh: '高度缩放' },
     '3d.canvas.reset': { en: 'Reset Canvas', zh: '重置画布' },
     '3d.export': { en: 'Export 3D Model', zh: '导出 3D 模型' },
+    '3d.fullscreen': { en: 'Toggle Fullscreen', zh: '切换全屏' },
 
     // Settings
     'settings.language': { en: 'Language', zh: '语言' },

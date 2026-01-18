@@ -15,7 +15,9 @@ import {
     Activity,
     Box,
     CircleDot,
-    FileDown
+    FileDown,
+    Maximize,
+    Minimize
 } from 'lucide-react';
 import { OBJExporter } from 'three/examples/jsm/exporters/OBJExporter.js';
 
@@ -354,6 +356,17 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
     const [heightScale, setHeightScale] = useState(0.5);
     const [colorMap, setColorMap] = useState<ColorMapType>('grayscale');
     const [isPulsing, setIsPulsing] = useState(false);
+    const [isFullScreen, setIsFullScreen] = useState(false);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isFullScreen) {
+                setIsFullScreen(false);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isFullScreen]);
 
     // Refs for OrbitControls are handled inside SceneContent implicitly via drei
 
@@ -384,7 +397,9 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
     };
 
     return (
-        <div className={`relative bg-neutral-900 rounded-lg overflow-hidden group h-full ${className}`}>
+        <div className={`${isFullScreen 
+            ? 'fixed inset-0 z-[100] w-screen h-screen rounded-none' 
+            : `relative rounded-lg overflow-hidden h-full ${className}`} bg-neutral-900 group transition-all duration-300`}>
             <Canvas
                 gl={{ preserveDrawingBuffer: true }} // Required for screenshot
                 camera={{ position: [0, 0, 2.2], fov: 50 }}
@@ -409,6 +424,16 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
 
             {/* Controls Overlay */}
             <div className="absolute top-4 right-4 flex flex-col gap-2 p-2 bg-black/50 backdrop-blur-sm rounded-lg border border-white/10 transition-opacity">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-white hover:bg-white/20 active:bg-white/30"
+                    onClick={() => setIsFullScreen(!isFullScreen)}
+                    title={t('3d.fullscreen')}
+                >
+                    {isFullScreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+                </Button>
+
                 <Button
                     variant="ghost"
                     size="icon"
