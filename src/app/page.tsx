@@ -1,490 +1,296 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import Link from 'next/link';
+import { Image, Database, ArrowRight, Sparkles, Zap, BarChart3, Box } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { useEffect, useState } from 'react';
 
-import Link from "next/link";
-import {
-  Scan,
-  Activity,
-  Box,
-  ArrowRight,
-  Binary,
-  Sparkles,
-} from "lucide-react";
-import { DitherShader } from "@/components/ui/dither-shader";
-import { Card, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useI18n } from "@/lib/i18n-context";
-import { motion, type Easing } from "framer-motion";
+// Animated floating particles
+function FloatingParticles() {
+  const [particles, setParticles] = useState<Array<{ left: string; top: string; delay: string; duration: string }>>([]);
 
-const easeOut: Easing = [0.6, 0.01, 0.05, 0.95]; // Custom ease curve
+  useEffect(() => {
+    const newParticles = [...Array(20)].map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 2}s`,
+      duration: `${2 + Math.random() * 3}s`,
+    }));
+    setParticles(newParticles);
+  }, []);
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.8, ease: easeOut },
-  },
-};
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map((p, i) => (
+        <div
+          key={i}
+          className="absolute w-1 h-1 bg-primary/20 rounded-full animate-pulse"
+          style={{
+            left: p.left,
+            top: p.top,
+            animationDelay: p.delay,
+            animationDuration: p.duration,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
+// Interactive 3D cube animation
+function AnimatedCube() {
+  const [rotation, setRotation] = useState({ x: -20, y: 45 });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRotation(prev => ({
+        x: prev.x,
+        y: (prev.y + 0.5) % 360,
+      }));
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div
+      className="w-24 h-24 relative preserve-3d cursor-pointer hover:scale-110 transition-transform"
+      style={{
+        transformStyle: 'preserve-3d',
+        transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+      }}
+      onMouseEnter={() => setRotation(prev => ({ ...prev, x: -30 }))}
+      onMouseLeave={() => setRotation(prev => ({ ...prev, x: -20 }))}
+    >
+      {/* Front */}
+      <div
+        className="absolute w-24 h-24 bg-gradient-to-br from-emerald-400/80 to-teal-500/80 border border-white/20 backdrop-blur-sm flex items-center justify-center"
+        style={{ transform: 'translateZ(48px)' }}
+      >
+        <Image className="w-8 h-8 text-white" />
+      </div>
+      {/* Back */}
+      <div
+        className="absolute w-24 h-24 bg-gradient-to-br from-violet-400/80 to-purple-500/80 border border-white/20 backdrop-blur-sm flex items-center justify-center"
+        style={{ transform: 'rotateY(180deg) translateZ(48px)' }}
+      >
+        <Database className="w-8 h-8 text-white" />
+      </div>
+      {/* Right */}
+      <div
+        className="absolute w-24 h-24 bg-gradient-to-br from-blue-400/80 to-cyan-500/80 border border-white/20 backdrop-blur-sm flex items-center justify-center"
+        style={{ transform: 'rotateY(90deg) translateZ(48px)' }}
+      >
+        <BarChart3 className="w-8 h-8 text-white" />
+      </div>
+      {/* Left */}
+      <div
+        className="absolute w-24 h-24 bg-gradient-to-br from-pink-400/80 to-rose-500/80 border border-white/20 backdrop-blur-sm flex items-center justify-center"
+        style={{ transform: 'rotateY(-90deg) translateZ(48px)' }}
+      >
+        <Box className="w-8 h-8 text-white" />
+      </div>
+      {/* Top */}
+      <div
+        className="absolute w-24 h-24 bg-gradient-to-br from-amber-400/80 to-orange-500/80 border border-white/20 backdrop-blur-sm flex items-center justify-center"
+        style={{ transform: 'rotateX(90deg) translateZ(48px)' }}
+      >
+        <Zap className="w-8 h-8 text-white" />
+      </div>
+      {/* Bottom */}
+      <div
+        className="absolute w-24 h-24 bg-gradient-to-br from-indigo-400/80 to-blue-500/80 border border-white/20 backdrop-blur-sm flex items-center justify-center"
+        style={{ transform: 'rotateX(-90deg) translateZ(48px)' }}
+      >
+        <Sparkles className="w-8 h-8 text-white" />
+      </div>
+    </div>
+  );
+}
+
+// Stats counter animation
+function AnimatedCounter({ end, label }: { end: number; label: string }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let current = 0;
+    const step = end / 30;
+    const interval = setInterval(() => {
+      current += step;
+      if (current >= end) {
+        setCount(end);
+        clearInterval(interval);
+      } else {
+        setCount(Math.floor(current));
+      }
+    }, 50);
+    return () => clearInterval(interval);
+  }, [end]);
+
+  return (
+    <div className="text-center">
+      <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+        {count}+
+      </div>
+      <div className="text-sm text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
+// Feature cards with I18n
+function FeatureCards({ t }: { t: (key: string) => string }) {
+  const features = [
+    {
+      title: t('home.card.i2p.title'),
+      description: t('home.card.i2p.desc'),
+      icon: Image,
+      href: '/image-to-points',
+      gradient: 'from-emerald-500 to-teal-600',
+      features: [t('home.tag.grayscale'), t('home.tag.region'), t('home.tag.histogram'), t('home.tag.export')],
     },
-  },
-};
+    {
+      title: t('home.card.p2i.title'),
+      description: t('home.card.p2i.desc'),
+      icon: Database,
+      href: '/points-to-image',
+      gradient: 'from-violet-500 to-purple-600',
+      features: [t('home.tag.import'), t('home.tag.generate'), t('home.tag.3dView'), t('home.tag.export')],
+    },
+  ];
 
-const scaleIn = {
-  hidden: { scale: 0.9, opacity: 0 },
-  visible: {
-    scale: 1,
-    opacity: 1,
-    transition: { duration: 0.5, ease: easeOut },
-  },
-};
+  return (
+    <div className="grid md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto mb-12">
+      {features.map((feature, idx) => {
+        const Icon = feature.icon;
+        return (
+          <Link key={feature.href} href={feature.href} className="block group">
+            <Card className="h-full border-2 transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 overflow-hidden relative">
+              {/* Animated background gradient */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+
+              <CardHeader className="relative">
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                  <Icon className="w-7 h-7 text-white" />
+                </div>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  {feature.title}
+                  <ArrowRight className="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                </CardTitle>
+                <CardDescription className="text-base">
+                  {feature.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="relative">
+                <div className="flex flex-wrap gap-2">
+                  {feature.features.map((f, i) => (
+                    <Badge
+                      key={f}
+                      variant="secondary"
+                      className="text-xs transition-all duration-300"
+                      style={{ transitionDelay: `${i * 50}ms` }}
+                    >
+                      {f}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+// ... (AnimateCube and AnimatedCounter components remain same)
+
+import { useI18n } from '@/lib/i18n-context';
 
 export default function HomePage() {
   const { t } = useI18n();
 
-  // Animated dither effect state
-  const [gridSize, setGridSize] = useState(2);
-  const [direction, setDirection] = useState(1); // 1 = up, -1 = down
-
-  useEffect(() => {
-    // Animate gridSize: 2→3→4→5→6→5→4→3→2→3... (pingpong)
-    const gridInterval = setInterval(() => {
-      setGridSize((prev) => {
-        const next = prev + direction;
-        if (next > 6) {
-          setDirection(-1);
-          return 5;
-        }
-        if (next < 1) {
-          setDirection(1);
-          return 1;
-        }
-        return next;
-      });
-    }, 100);
-
-    return () => {
-      clearInterval(gridInterval);
-    };
-  }, [direction]);
-
   return (
-    <div className="relative min-h-screen bg-background text-foreground overflow-hidden">
-      {/* Abstract Technical Grid Background */}
-      <div
-        className="absolute inset-0 z-0 opacity-[0.03]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, #808080 1px, transparent 1px), linear-gradient(to bottom, #808080 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
+    <div className="relative min-h-screen">
+      <FloatingParticles />
 
-      {/* Animated Gradient Orbs */}
-      <motion.div
-        className="absolute top-20 -left-32 w-96 h-96 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/10 blur-3xl"
-        animate={{
-          x: [0, 50, 0],
-          y: [0, 30, 0],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="absolute bottom-40 -right-32 w-80 h-80 rounded-full bg-gradient-to-br from-cyan-500/15 to-blue-500/10 blur-3xl"
-        animate={{
-          x: [0, -40, 0],
-          y: [0, -50, 0],
-          scale: [1, 1.2, 1],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-cyan-500/5 to-transparent blur-3xl"
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{
-          duration: 6,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
+      <div className="container max-w-screen-xl mx-auto px-4 py-8 md:py-12">
+        {/* Hero Section */}
+        <div className="text-center mb-12 md:mb-16 relative">
+          <Badge variant="secondary" className="mb-4 animate-pulse">
+            <Sparkles className="w-3 h-3 mr-1" />
+            {t('home.hero.subtitle')}
+          </Badge>
 
-      {/* Floating Particles */}
-      {[...Array(6)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 rounded-full bg-cyan-400/60"
-          style={{
-            left: `${15 + i * 15}%`,
-            top: `${20 + (i % 3) * 25}%`,
-          }}
-          animate={{
-            y: [0, -30, 0],
-            opacity: [0.3, 0.8, 0.3],
-            scale: [1, 1.5, 1],
-          }}
-          transition={{
-            duration: 3 + i * 0.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: i * 0.3,
-          }}
-        />
-      ))}
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+            {t('home.hero.title')}
+          </h1>
 
-      {/* Animated Lines */}
-      <motion.div
-        className="absolute top-32 right-20 w-px h-32 bg-gradient-to-b from-transparent via-cyan-500/30 to-transparent"
-        animate={{
-          opacity: [0, 1, 0],
-          scaleY: [0.5, 1, 0.5],
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="absolute bottom-48 left-32 w-px h-24 bg-gradient-to-b from-transparent via-purple-500/30 to-transparent"
-        animate={{
-          opacity: [0, 1, 0],
-          scaleY: [0.5, 1, 0.5],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 1,
-        }}
-      />
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            {t('home.hero.description')}
+          </p>
 
-      <div className="container max-w-screen-xl mx-auto px-4 py-16 md:py-24 relative z-10">
-        {/* Academic Header Section */}
-        <motion.div
-          className="max-w-4xl mx-auto text-center mb-16 md:mb-24"
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer}
-        >
-          <motion.div
-            variants={fadeInUp}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/50 border border-secondary text-secondary-foreground text-xs font-mono mb-6 tracking-wider uppercase"
-          >
-            <img src="/logo.png" alt="Logo" className="w-4 h-4 mr-1" />
-            v2.0.0 | Research Edition
-          </motion.div>
-
-          <motion.h1
-            variants={fadeInUp}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 font-serif"
-          >
-            <motion.span
-              className="bg-gradient-to-r from-foreground via-cyan-500 to-foreground bg-[length:200%_auto] bg-clip-text text-transparent"
-              animate={{
-                backgroundPosition: ["0% center", "200% center"],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            >
-              {t("home.hero.title")}
-            </motion.span>
-          </motion.h1>
-
-          <motion.p
-            variants={fadeInUp}
-            className="text-xl md:text-2xl text-muted-foreground font-light max-w-2xl mx-auto mb-8 leading-relaxed"
-          >
-            {t("home.hero.subtitle")}
-          </motion.p>
-
-          <motion.p
-            variants={fadeInUp}
-            className="text-base text-muted-foreground/80 max-w-3xl mx-auto mb-10 leading-7"
-          >
-            {t("home.hero.description")}
-          </motion.p>
-
-          <motion.div
-            variants={fadeInUp}
-            className="flex flex-wrap items-center justify-center gap-4"
-          >
-            <Link href="/image-to-points">
-              <Button
-                size="lg"
-                className="h-12 px-8 rounded-none border-2 border-primary bg-primary text-primary-foreground hover:bg-primary/90 font-mono tracking-wide"
-              >
-                {t("home.start")} <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </Link>
-            <Link
-              href="https://github.com/stefan-ysh/image-toolkit-web"
-              target="_blank"
-            >
-              <Button
-                variant="outline"
-                size="lg"
-                className="h-12 px-8 rounded-none border-2 font-mono tracking-wide"
-              >
-                GitHub / Docs
-              </Button>
-            </Link>
-          </motion.div>
-        </motion.div>
-
-        {/* Dither Shader Showcase Section */}
-        <motion.div
-          className="w-full mx-auto mb-24"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="grid md:grid-cols-2 gap-0 border-2 border-border/60 overflow-hidden bg-card/30 backdrop-blur-sm">
-            {/* Dither Shader Image */}
-            <div className="relative h-64 md:h-80 lg:h-96 bg-background">
-              <DitherShader
-                src="/dither-showcase.png"
-                gridSize={gridSize}
-                ditherMode="bayer"
-                colorMode="original"
-                animated={true}
-                animationSpeed={0.01}
-                className="w-full h-full"
-              />
-              {/* <div className="absolute bottom-3 left-3 flex gap-2">
-                <Badge variant="secondary" className="font-mono text-xs rounded-none bg-background/80 backdrop-blur-sm">
-                  BAYER
-                </Badge>
-                <Badge variant="secondary" className="font-mono text-xs rounded-none bg-background/80 backdrop-blur-sm">
-                  SIZE: {Math.round(gridSize)}
-                </Badge>
-              </div> */}
-            </div>
-
-            {/* Feature Description */}
-            <div className="p-8 flex flex-col justify-center border-t md:border-t-0 md:border-l border-border/60 bg-muted/10">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-500">
-                  <Sparkles className="w-5 h-5" />
-                </div>
-                <h3 className="text-xl font-bold font-serif">{t("home.dither.title")}</h3>
-              </div>
-              <p className="text-muted-foreground mb-6 leading-relaxed">
-                {t("home.dither.desc")}
-              </p>
-              <ul className="space-y-3 text-sm font-mono">
-                <li className="flex items-center gap-3 text-muted-foreground">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
-                  {t("home.dither.modes")}
-                </li>
-                <li className="flex items-center gap-3 text-muted-foreground">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
-                  {t("home.dither.colors")}
-                </li>
-                <li className="flex items-center gap-3 text-muted-foreground">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
-                  {t("home.dither.animation")}
-                </li>
-              </ul>
-            </div>
+          {/* Interactive 3D Cube */}
+          <div className="flex justify-center mb-8" style={{ perspective: '600px' }}>
+            <AnimatedCube />
           </div>
-        </motion.div>
 
-        {/* Methodology / Analysis Steps */}
-        <motion.div
-          className="grid md:grid-cols-3 gap-8 mb-24 border-t border-b border-border py-12"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-        >
-          <motion.div variants={fadeInUp} className="space-y-4">
-            <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary text-primary mb-4">
-              <Scan className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold font-serif">
-              {t("home.steps.upload")}
-            </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {t("home.features.grayscale.desc")}
-            </p>
-            <ul className="text-xs text-muted-foreground space-y-2 mt-4 font-mono">
-              <li className="flex items-center gap-2">
-                • RAW / PNG / JPG Support
-              </li>
-              <li className="flex items-center gap-2">
-                • Linear Normalization
-              </li>
-              <li className="flex items-center gap-2">• Auto-Calibration</li>
-            </ul>
-          </motion.div>
-
-          <motion.div
-            variants={fadeInUp}
-            className="space-y-4 md:border-l border-border md:pl-8"
-          >
-            <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary text-primary mb-4">
-              <Activity className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold font-serif">
-              {t("home.steps.analyze")}
-            </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {t("home.features.analysis.desc")}
-            </p>
-            <ul className="text-xs text-muted-foreground space-y-2 mt-4 font-mono">
-              <li className="flex items-center gap-2">
-                • Histogram Generation
-              </li>
-              <li className="flex items-center gap-2">
-                • Statistical Distribution
-              </li>
-              <li className="flex items-center gap-2">• Pixel Profiling</li>
-            </ul>
-          </motion.div>
-
-          <motion.div
-            variants={fadeInUp}
-            className="space-y-4 md:border-l border-border md:pl-8"
-          >
-            <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary text-primary mb-4">
-              <Box className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold font-serif">
-              {t("home.steps.3d")}
-            </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {t("home.features.3d.desc")}
-            </p>
-            <ul className="text-xs text-muted-foreground space-y-2 mt-4 font-mono">
-              <li className="flex items-center gap-2">
-                • Point Cloud Generation
-              </li>
-              <li className="flex items-center gap-2">• Height Map Scaling</li>
-              <li className="flex items-center gap-2">
-                • Interactive Viewport
-              </li>
-            </ul>
-          </motion.div>
-        </motion.div>
-
-        {/* Unified Workbench Entry */}
-        <div className="w-full mx-auto">
-          <motion.div
-            className="text-center mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-2xl font-bold font-serif mb-2">
-              {t("common.title")}
-            </h2>
-            <p className="text-muted-foreground text-sm font-mono">
-              SYSTEM_MODULE: WORKBENCH_CORE
-            </p>
-          </motion.div>
-
-          <Link href="/image-to-points" className="block group">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              whileHover={{ scale: 1.02 }}
-              viewport={{ once: true }}
-              variants={scaleIn}
-            >
-              <Card className="border-2 border-border/60 hover:border-primary transition-colors duration-300 bg-card/50 backdrop-blur-sm">
-                <div className="grid md:grid-cols-2">
-                  <div className="p-8 flex flex-col justify-center border-b md:border-b-0 md:border-r border-border/60">
-                    <CardTitle className="text-2xl font-serif mb-4 group-hover:text-primary transition-colors">
-                      {t("home.card.unified.title")}
-                    </CardTitle>
-                    <CardDescription className="text-base leading-relaxed mb-6">
-                      {t("home.card.unified.desc")}
-                    </CardDescription>
-                    <div className="flex flex-wrap gap-2 mt-auto">
-                      {[
-                        { label: t("home.tag.grayscale") },
-                        { label: t("home.tag.region") },
-                        { label: t("home.tag.histogram") },
-                        { label: t("home.tag.3dView") },
-                      ].map((tag) => (
-                        <Badge
-                          key={tag.label}
-                          variant="outline"
-                          className="font-mono text-xs rounded-none border-primary/20 text-foreground/80"
-                        >
-                          {tag.label}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="p-8 bg-muted/20 flex flex-col justify-between">
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                      <div className="p-4 bg-background border border-border rounded-sm">
-                        <h4 className="font-mono text-xs text-muted-foreground mb-2 uppercase tracking-wider">
-                          {t("home.stats.grayLevels")}
-                        </h4>
-                        <span className="text-2xl font-bold">256</span>
-                      </div>
-                      <div className="p-4 bg-background border border-border rounded-sm">
-                        <h4 className="font-mono text-xs text-muted-foreground mb-2 uppercase tracking-wider">
-                          {t("home.stats.3dView")}
-                        </h4>
-                        <span className="text-2xl font-bold">WebGL</span>
-                      </div>
-                    </div>
-                    <Button
-                      className="w-full rounded-none group-hover:bg-cyan-500 group-hover:text-white transition-all font-bold tracking-wide"
-                      variant="secondary"
-                    >
-                      Launch Platform <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          </Link>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/image-to-points">
+              <Button size="lg" className="gap-2 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all">
+                <Zap className="w-4 h-4" />
+                {t('home.start')}
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        {/* Footer / Citation Style */}
-        <motion.div
-          className="mt-32 pt-8 border-t border-border text-center text-xs text-muted-foreground font-mono"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-        >
-          <p>© 2024 Image Analysis Platform. Academic License.</p>
-          <p className="mt-2">
-            Developed for quantitative research and educational visualization.
-          </p>
-        </motion.div>
+        {/* Stats Section */}
+        <div className="grid grid-cols-3 gap-4 max-w-md mx-auto mb-12 md:mb-16 p-4 rounded-xl bg-muted/30 border border-border/50">
+          <AnimatedCounter end={256} label={t('home.stats.grayLevels')} />
+          <AnimatedCounter end={100} label={t('home.stats.exportFormats')} />
+          <AnimatedCounter end={360} label={t('home.stats.3dView')} />
+        </div>
+
+        {/* Feature Cards */}
+        <FeatureCards t={t} />
+
+        {/* Workflow Section */}
+        <div className="text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-8">{t('home.workflow.title')}</h2>
+
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">
+            {[
+              { icon: Image, label: t('home.workflow.upload'), color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+              { icon: BarChart3, label: t('home.workflow.analyze'), color: 'text-blue-500', bg: 'bg-blue-500/10' },
+              { icon: Box, label: t('home.workflow.3d'), color: 'text-violet-500', bg: 'bg-violet-500/10' },
+            ].map((step, idx) => (
+              <div key={step.label} className="flex items-center gap-4">
+                <div className={`flex items-center gap-3 p-4 rounded-xl ${step.bg} border border-border hover:scale-105 transition-transform cursor-default`}>
+                  <step.icon className={`w-6 h-6 ${step.color}`} />
+                  <span className="font-medium">{step.label}</span>
+                </div>
+                {idx < 2 && (
+                  <ArrowRight className="w-5 h-5 text-muted-foreground rotate-90 md:rotate-0 hidden md:block" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
+      {/* CSS for gradient animation */}
+      <style jsx>{`
+        @keyframes gradient {
+          0% { background-position: 0% center; }
+          50% { background-position: 100% center; }
+          100% { background-position: 0% center; }
+        }
+        .animate-gradient {
+          animation: gradient 4s ease infinite;
+        }
+      `}</style>
     </div>
   );
 }

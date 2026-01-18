@@ -94,37 +94,6 @@ export function extractRegionData(
 }
 
 /**
- * Extract ImageData for a specific region
- */
-export function extractRegionImageData(
-  imageData: ImageData,
-  region: Region
-): ImageData {
-  const { x, y, width, height } = region;
-  // Create new ImageData with region dimensions
-  // Note: We need a canvas to create standard ImageData easily or use constructor if supported env
-  // Using canvas is safer for browser compatibility if ImageData constructor has issues,
-  // but ImageData constructor is standard now. Let's use array copy.
-
-  // Check bounds
-  const safeWidth = Math.min(width, imageData.width - x);
-  const safeHeight = Math.min(height, imageData.height - y);
-
-  const newData = new Uint8ClampedArray(safeWidth * safeHeight * 4);
-
-  for (let row = 0; row < safeHeight; row++) {
-    const sourceRowStart = ((y + row) * imageData.width + x) * 4;
-    const targetRowStart = (row * safeWidth) * 4;
-
-    // Copy row
-    const rowData = imageData.data.slice(sourceRowStart, sourceRowStart + safeWidth * 4);
-    newData.set(rowData, targetRowStart);
-  }
-
-  return new ImageData(newData, safeWidth, safeHeight);
-}
-
-/**
  * Calculate statistics for grayscale values
  */
 export function calculateStatistics(values: Uint8Array): ImageStatistics {
@@ -132,43 +101,26 @@ export function calculateStatistics(values: Uint8Array): ImageStatistics {
     return { mean: 0, std: 0, min: 0, max: 0, median: 0, totalPixels: 0 };
   }
 
-  // Use histogram for O(N) median calculation and single pass for others
-  let sum = 0;
-  let min = 255;
-  let max = 0;
-  const histogram = new Uint32Array(256);
+  const arr = Array.from(values);
+  const sum = arr.reduce((a, b) => a + b, 0);
+  const mean = sum / arr.length;
 
-  for (let i = 0; i < values.length; i++) {
-    const v = values[i];
-    sum += v;
-    if (v < min) min = v;
-    if (v > max) max = v;
-    histogram[v]++;
-  }
+  const squareDiffs = arr.map(v => Math.pow(v - mean, 2));
+  const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / arr.length;
+  const std = Math.sqrt(avgSquareDiff);
 
-  const mean = sum / values.length;
+  const sorted = [...arr].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  const median = sorted.length % 2 !== 0
+    ? sorted[mid]
+    : (sorted[mid - 1] + sorted[mid]) / 2;
 
-  // Calculate Std Dev (2nd pass)
-  let sumSqDiff = 0;
-  for (let i = 0; i < values.length; i++) {
-    const diff = values[i] - mean;
-    sumSqDiff += diff * diff;
-  }
-  const std = Math.sqrt(sumSqDiff / values.length);
-
-  // Calculate Median from Histogram
-  let median = 0;
-  let count = 0;
-  const mid = Math.floor(values.length / 2);
-
-  // To match exact sorting logic for even/odd, we need to find the element(s) at mid
-  // But for 0-255 integer visualization stats, finding the bucket is sufficient and faster
-  for (let i = 0; i < 256; i++) {
-    count += histogram[i];
-    if (count > mid) {
-      median = i;
-      break;
-    }
+  // Find min and max without spread operator to avoid stack overflow
+  let min = arr[0];
+  let max = arr[0];
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] < min) min = arr[i];
+    if (arr[i] > max) max = arr[i];
   }
 
   return {
@@ -176,8 +128,8 @@ export function calculateStatistics(values: Uint8Array): ImageStatistics {
     std: Math.round(std * 100) / 100,
     min,
     max,
-    median,
-    totalPixels: values.length,
+    median: Math.round(median * 100) / 100,
+    totalPixels: arr.length,
   };
 }
 

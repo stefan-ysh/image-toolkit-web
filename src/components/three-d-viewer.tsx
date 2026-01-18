@@ -14,10 +14,8 @@ import {
     Camera,
     Activity,
     Box,
-    CircleDot,
-    FileDown
+    CircleDot
 } from 'lucide-react';
-import { OBJExporter } from 'three/examples/jsm/exporters/OBJExporter.js';
 
 type ColorMapType = 'grayscale' | 'hot' | 'cool' | 'jet' | 'rainbow' | 'viridis' | 'plasma';
 type RenderMode = 'surface' | 'wireframe' | 'points';
@@ -147,10 +145,11 @@ function Surface({ imageData, renderMode, heightScale, colorMap, isPulsing }: Su
 
         // Downsample for performance
         const maxSize = 200;
-        const step = Math.max(1, Math.ceil(Math.max(width, height) / maxSize));
+        const stepX = Math.max(1, Math.floor(width / maxSize));
+        const stepY = Math.max(1, Math.floor(height / maxSize));
 
-        const sampledWidth = Math.floor(width / step);
-        const sampledHeight = Math.floor(height / step);
+        const sampledWidth = Math.floor(width / stepX);
+        const sampledHeight = Math.floor(height / stepY);
 
         const geo = new THREE.PlaneGeometry(
             2, // width
@@ -168,8 +167,8 @@ function Surface({ imageData, renderMode, heightScale, colorMap, isPulsing }: Su
                 const posIndex = vertexIndex * 3;
 
                 // Get grayscale value from original image
-                const imgX = i * step;
-                const imgY = j * step;
+                const imgX = i * stepX;
+                const imgY = j * stepY;
                 const pixelIndex = (imgY * width + imgX) * 4;
                 const gray = data[pixelIndex] / 255;
 
@@ -235,28 +234,6 @@ function SceneContent({ imageData, renderMode, heightScale, colorMap, isPulsing 
         return () => window.removeEventListener('trigger-3d-screenshot', handleScreenshot);
     }, [gl, scene, camera]);
 
-    // Handle OBJ Export
-    useEffect(() => {
-        const handleExport = () => {
-            const exporter = new OBJExporter();
-            // We only want to export the mesh (Surface), not the lights or background
-            // Find the mesh in the scene or just export the whole scene filtered?
-            // Actually, we can reference the mesh if we had the ref here, but we don't.
-            // Let's traverse the scene and find the mesh.
-
-            // Simpler: Just export the whole scene, OBJExporter usually ignores lights/cameras.
-            const result = exporter.parse(scene);
-            const blob = new Blob([result], { type: 'text/plain' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'model.obj';
-            link.click();
-        };
-
-        window.addEventListener('trigger-obj-export', handleExport);
-        return () => window.removeEventListener('trigger-obj-export', handleExport);
-    }, [scene]);
-
     return (
         <>
             <OrbitControls
@@ -294,57 +271,10 @@ function SceneContent({ imageData, renderMode, heightScale, colorMap, isPulsing 
                 colorMap={colorMap}
                 isPulsing={isPulsing}
             />
-            <AutoFitCamera imageData={imageData} />
             {/* Fog for depth perception */}
             <fog attach="fog" args={['#171717', 2, 12]} />
         </>
     );
-}
-
-function AutoFitCamera({ imageData }: { imageData: ImageData }) {
-    const { camera, size } = useThree();
-    const controls = useRef<any>(null); // We don't have access to the main controls ref here easily without context, but we can manipulate camera directly.
-
-    useEffect(() => {
-        if (!imageData) return;
-
-        const { width, height } = imageData;
-        const aspect = width / height; // Image aspect
-
-        // Geometry is always Width = 2.
-        // Geometry Height = 2 / aspect.
-
-        const geoWidth = 2;
-        const geoHeight = 2 / aspect;
-
-        // Calculate distance to fit height
-        const vFOV = (camera as THREE.PerspectiveCamera).fov * Math.PI / 180;
-        const distVertical = (geoHeight / 2) / Math.tan(vFOV / 2);
-
-        // Calculate distance to fit width (taking canvas aspect into account)
-        const canvasAspect = size.width / size.height;
-        // visibleWidth = 2 * dist * tan(vfov/2) * canvasAspect
-        // distHorizontal = (geoWidth / 2) / (tan(vfov/2) * canvasAspect)
-        const distHorizontal = (geoWidth / 2) / (Math.tan(vFOV / 2) * canvasAspect);
-
-        // Choose the larger distance to fit both constraints (contain), or smaller to fill (cover).
-        // Let's go with "fit mostly" - maybe 90% fill.
-        const fitDist = Math.max(distVertical, distHorizontal);
-
-        // Add a small margin (e.g. 1.1x)
-        const targetZ = fitDist * 1.05;
-
-        // Smoothly move camera? Or just set it. Just set it for now.
-        camera.position.set(0, 0, targetZ);
-        camera.lookAt(0, 0, 0);
-        camera.updateProjectionMatrix();
-
-        // Dispatch reset event for controls to re-read camera
-        // window.dispatchEvent(new Event('trigger-camera-reset')); // OrbitControls might overwrite this if not careful.
-
-    }, [imageData, camera, size]);
-
-    return null;
 }
 
 export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
@@ -379,15 +309,11 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
         window.dispatchEvent(new Event('trigger-3d-screenshot'));
     };
 
-    const handleExportOBJ = () => {
-        window.dispatchEvent(new Event('trigger-obj-export'));
-    };
-
     return (
-        <div className={`relative bg-neutral-900 rounded-lg overflow-hidden group h-full ${className}`}>
+        <div className={`relative bg-neutral-900 rounded-lg overflow-hidden group ${className}`}>
             <Canvas
                 gl={{ preserveDrawingBuffer: true }} // Required for screenshot
-                camera={{ position: [0, 0, 2.2], fov: 50 }}
+                camera={{ position: [0, -1.5, 2.5], fov: 50 }}
             >
                 <SceneContent
                     imageData={imageData}
@@ -470,16 +396,6 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-white hover:bg-white/20 active:bg-white/30"
-                    onClick={handleExportOBJ}
-                    title={t ? "Export OBJ" : "Export 3D Model"}
-                >
-                    <FileDown className="h-4 w-4" />
-                </Button>
-
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-white hover:bg-white/20 active:bg-white/30"
                     onClick={() => {
                         // Reset handled via key prop on Canvas usually, or we can just reset state
                         setHeightScale(0.5);
@@ -526,18 +442,8 @@ function ControlsWrapper({ autoRotate }: { autoRotate: boolean }) {
         const handleReset = () => {
             controlsRef.current?.reset();
         };
-        const handleResetTarget = () => {
-            if (controlsRef.current) {
-                controlsRef.current.target.set(0, 0, 0);
-                controlsRef.current.update();
-            }
-        };
         window.addEventListener('trigger-camera-reset', handleReset);
-        window.addEventListener('reset-controls-target', handleResetTarget);
-        return () => {
-            window.removeEventListener('trigger-camera-reset', handleReset);
-            window.removeEventListener('reset-controls-target', handleResetTarget);
-        };
+        return () => window.removeEventListener('trigger-camera-reset', handleReset);
     }, []);
 
     return (
@@ -548,8 +454,8 @@ function ControlsWrapper({ autoRotate }: { autoRotate: boolean }) {
             enableRotate={true}
             autoRotate={autoRotate}
             autoRotateSpeed={2.0}
-            minDistance={0.5}
-            maxDistance={8}
+            minDistance={1}
+            maxDistance={10}
         />
     );
 }

@@ -15,16 +15,12 @@ const translations: Translations = {
     // Navigation
     'nav.home': { en: 'Home', zh: '首页' },
     'nav.imageToPoints': { en: 'Image to Points', zh: '图像转点云' },
+    'nav.pointsToImage': { en: 'Points to Image', zh: '点云转图像' },
 
     // Home
     'home.hero.title': { en: 'Image ToolKit', zh: '图像处理工具箱' },
     'home.hero.subtitle': { en: 'Professional Image Processing & Analysis', zh: '专业图像处理与分析' },
     'home.hero.description': { en: 'Convert images to grayscale, analyze pixel distributions, and visualize 3D point clouds. All in your browser.', zh: '将图像转换为灰度，分析像素分布，并在浏览器中可视化3D点云。' },
-
-    // Common Page Headers
-    'common.title': { en: 'Image Toolkit', zh: '图像工具箱' },
-    'common.description': { en: 'Upload an image for analysis or import point cloud data to visualize and reconstruct.', zh: '上传图像进行分析，或导入点云数据进行可视化和重建。' },
-
     'home.features.grayscale': { en: 'Grayscale Conversion', zh: '灰度转换' },
     'home.features.grayscale.desc': { en: 'Convert images to high-quality grayscale with precise algorithms.', zh: '使用精确算法将图像转换为高质量灰度图。' },
     'home.features.analysis': { en: 'Region Analysis', zh: '区域分析' },
@@ -32,11 +28,14 @@ const translations: Translations = {
     'home.features.3d': { en: '3D Visualization', zh: '3D 可视化' },
     'home.features.3d.desc': { en: 'View your image data as interactive 3D point clouds surfaces.', zh: '将图像数据作为交互式3D点云表面查看。' },
     // Home Cards & Workflow
-    'home.card.unified.title': { en: 'Enter Workbench', zh: '进入工作台' },
-    'home.card.unified.desc': { en: 'Access the unified environment for data acquisition, processing, and visualization.', zh: '访问集数据采集、处理和可视化于一体的统一环境。' },
-    'home.steps.upload': { en: 'Data Acquisition', zh: '数据采集' },
-    'home.steps.analyze': { en: 'Quantitative Processing', zh: '定量处理' },
-    'home.steps.3d': { en: 'Topographic Rendering', zh: '形貌渲染' },
+    'home.card.i2p.title': { en: 'Image to Points', zh: '图像转点云' },
+    'home.card.i2p.desc': { en: 'Convert images to grayscale, analyze regions, and export point cloud data', zh: '将图像转换为灰度，分析区域数据并导出点云' },
+    'home.card.p2i.title': { en: 'Points to Image', zh: '点云转图像' },
+    'home.card.p2i.desc': { en: 'Convert point cloud data back to grayscale images with 3D visualization', zh: '将点云数据转换回灰度图像并进行3D可视化' },
+    'home.workflow.title': { en: 'Seamless Workflow', zh: '无缝工作流程' },
+    'home.workflow.upload': { en: 'Upload Image', zh: '上传图像' },
+    'home.workflow.analyze': { en: 'Analyze Regions', zh: '区域分析' },
+    'home.workflow.3d': { en: '3D Visualization', zh: '3D 可视化' },
 
     // Image to Points
     'i2p.title': { en: 'Image → Point Cloud', zh: '图像 → 点云' },
@@ -69,12 +68,32 @@ const translations: Translations = {
     'i2p.chart.profile': { en: 'Pixel Profile View', zh: '像素剖面视图' },
     'i2p.chart.distribution': { en: 'Grayscale Distribution', zh: '灰度分布' },
 
+    // Points to Image
+    'p2i.title': { en: 'Point Cloud → Image', zh: '点云 → 图像' },
+    'p2i.description': { en: 'Import CSV/Excel point cloud data and convert to grayscale images with 3D visualization', zh: '导入CSV/Excel点云数据并转换为具有3D可视化的灰度图像' },
+    'p2i.import.title': { en: 'Import Point Cloud Data', zh: '导入点云数据' },
+    'p2i.import.desc': { en: 'Upload CSV or Excel file with X, Y, Grayscale columns', zh: '上传包含X、Y、灰度列的CSV或Excel文件' },
+    'p2i.processing': { en: 'Processing file...', zh: '正在处理文件...' },
+    'p2i.generated.title': { en: 'Generated Image', zh: '生成图像' },
+    'p2i.common.newFile': { en: 'New File', zh: '新文件' },
+    'p2i.view.2d': { en: '2D Image', zh: '2D 图像' },
+    'p2i.view.3d': { en: '3D View', zh: '3D 视图' },
+    'p2i.info.title': { en: 'File Information', zh: '文件信息' },
+    'p2i.info.filename': { en: 'Filename', zh: '文件名' },
+    'p2i.info.totalPoints': { en: 'Total Points', zh: '总点数' },
+    'p2i.info.xRange': { en: 'X Range', zh: 'X 范围' },
+    'p2i.info.yRange': { en: 'Y Range', zh: 'Y 范围' },
+    'p2i.req.title': { en: 'Format Requirements', zh: '格式要求' },
+    'p2i.req.columns': { en: 'Required Columns:', zh: '必需列：' },
+    'p2i.req.col.x': { en: 'Horizontal coordinate', zh: '水平坐标' },
+    'p2i.req.col.y': { en: 'Vertical coordinate', zh: '垂直坐标' },
+    'p2i.req.col.gray': { en: 'Value (0-255)', zh: '值 (0-255)' },
+    'p2i.req.example': { en: 'Example:', zh: '示例：' },
+
     // Common Components
-    'comp.upload.dragDrop': { en: 'Drag and drop image here, or click to upload', zh: '将图片拖拽至此，或点击上传' },
-    'comp.upload.mobile': { en: 'Tap to upload or take a photo', zh: '点击上传或拍照' },
+    'comp.upload.dragDrop': { en: 'Drag and drop files here, or click to browse', zh: '拖放文件到此处，或点击浏览' },
     'comp.upload.supports': { en: 'Supports', zh: '支持' },
     'comp.upload.loading': { en: 'Loading...', zh: '加载中...' },
-    'comp.upload.camera': { en: 'Take Photo', zh: '拍照' },
     'comp.chart.analyzing': { en: 'Analyzing...', zh: '正在分析...' },
     'comp.chart.gray': { en: 'Grayscale', zh: '灰度' },
     'comp.chart.grayscaleDist': { en: 'Grayscale Distribution', zh: '灰度分布' },
@@ -83,9 +102,9 @@ const translations: Translations = {
     'comp.chart.points': { en: 'Points', zh: '点数' },
 
     // Home Stats & Features
-    'home.stats.grayLevels': { en: 'Bit Depth (8-bit)', zh: '位深度 (8-bit)' },
+    'home.stats.grayLevels': { en: 'Gray Levels', zh: '灰度级' },
     'home.stats.exportFormats': { en: 'Export Formats', zh: '导出格式' },
-    'home.stats.3dView': { en: 'Render Engine', zh: '渲染引擎' },
+    'home.stats.3dView': { en: '3D View', zh: '3D 视图' },
     'home.tag.grayscale': { en: 'Grayscale', zh: '灰度' },
     'home.tag.region': { en: 'Region', zh: '区域' },
     'home.tag.histogram': { en: 'Histogram', zh: '直方图' },
@@ -110,13 +129,6 @@ const translations: Translations = {
     // Settings
     'settings.language': { en: 'Language', zh: '语言' },
     'settings.theme': { en: 'Theme', zh: '主题' },
-
-    // Dither Shader Showcase
-    'home.dither.title': { en: 'Pixel Art Effects', zh: '像素艺术效果' },
-    'home.dither.desc': { en: 'Transform images with real-time ordered dithering. Perfect for creating retro aesthetics, pixel art effects, and unique visual styles.', zh: '使用实时有序抖动转换图像。非常适合创建复古美学、像素艺术效果和独特的视觉风格。' },
-    'home.dither.modes': { en: 'Bayer / Halftone / Noise / Crosshatch', zh: 'Bayer / 半色调 / 噪点 / 交叉线' },
-    'home.dither.colors': { en: 'Grayscale / Duotone / Custom Palette', zh: '灰度 / 双色调 / 自定义调色板' },
-    'home.dither.animation': { en: 'Real-time Animation Support', zh: '实时动画支持' },
 };
 
 interface I18nContextType {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { Upload, File, X, Loader2, Camera } from 'lucide-react';
+import { Upload, File, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/lib/i18n-context';
 
@@ -128,37 +128,15 @@ export function FileUpload({
                     </div>
 
                     <div className="space-y-1">
-                        {/* Desktop Text */}
-                        <p className="hidden md:block text-sm font-medium text-foreground">
-                            {description || t('comp.upload.dragDrop')}
-                        </p>
-                        {/* Mobile Text */}
-                        <p className="md:hidden text-sm font-medium text-foreground">
-                            {t('comp.upload.mobile')}
-                        </p>
-
+                        <p className="text-sm font-medium text-foreground">{description || defaultDescription}</p>
                         <p className="text-xs text-muted-foreground">
-                            {t('comp.upload.supports')}: PNG, JPG, JPEG
+                            {accept === 'image/*'
+                                ? `${t('comp.upload.supports')}: PNG, JPG, JPEG`
+                                : accept?.includes('.csv')
+                                    ? `${t('comp.upload.supports')}: CSV, Excel (.xlsx, .xls)`
+                                    : accept
+                            }
                         </p>
-                    </div>
-
-                    {/* Camera Button for Mobile/Tablet */}
-                    <div className="pt-2">
-                        <label className={(
-                            'inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ' +
-                            'bg-secondary text-secondary-foreground hover:bg-secondary/80 cursor-pointer transition-colors shadow-sm'
-                        )}>
-                            <Camera className="w-4 h-4" />
-                            <span>{t ? t('comp.upload.camera') : "Take Photo"}</span>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                capture="environment"
-                                className="hidden"
-                                onChange={handleFileInput}
-                                disabled={isLoading}
-                            />
-                        </label>
                     </div>
                 </div>
             </label>

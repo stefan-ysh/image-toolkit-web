@@ -1,112 +1,84 @@
 # Image Toolkit Web
 
-A modern web application for advanced image processing, quantitative analysis, and 3D visualization. Built with Next.js and WebGL.
+一个现代化的 Web 应用，整合了图像灰度转换、区域分析和点云可视化功能。
 
-![App Logo](public/logo.png)
+## 🎯 功能特性
 
-[中文](./README_zh.md) | [日本語](./README_ja.md)
+### 📸 Image → Point Cloud
+- 图片上传（支持拖拽）
+- 自动灰度转换
+- 交互式区域选择
+- 实时直方图分析
+- 统计数据展示
+- 多格式导出（CSV/Excel）
 
-## 🎯 Features
+### 🔄 Point Cloud → Image
+- CSV/Excel 文件导入
+- 点云数据验证
+- 灰度图像生成
+- 2D/3D 可视化
+- 图像下载
 
-### 📸 Image Processing & Analysis
+## 🚀 快速开始
 
-- **Format Support**: Drag & drop support for PNG, JPG, JPEG, and RAW formats.
-- **Grayscale Conversion**: High-precision algorithms for linear normalization and auto-calibration.
-- **Region Analysis**: Interactive rectangular selection tools for targeted area analysis.
-- **Quantitative Data**: Real-time histogram generation, pixel distribution statistics, and profiling.
-- **Data Export**: Export analysis results to CSV or Excel formats for external processing.
-
-### 🎨 Pixel Art & Dither Effects
-
-- **Real-time Dithering**: Apply ordered dithering effects (Bayer, Halftone, Noise, Crosshatch).
-- **Color Modes**: Support for Grayscale, Duotone, and Custom Palettes.
-- **Animation**: Dynamic grid size breathing effects and animated noise patterns.
-
-### 🔄 Point Cloud & 3D Visualization
-
-- **Data Import**: Reconstruct images from CSV/Excel point cloud data (X, Y, Grayscale).
-- **3D Rendering**: Interactive 3D surface visualization using Three.js and React Three Fiber.
-- **View Controls**: Adjustable height scaling, color mapping, pulse animation, and auto-rotation.
-- **Export**: Download reconstructed 2D images or 3D view snapshots.
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-
-### Installation
+### 安装依赖
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/image-toolkit-web.git
-
-# Navigate to project directory
-cd image-toolkit-web
-
-# Install dependencies
 npm install
 ```
 
-### Development
+### 开发模式
 
 ```bash
-# Start development server
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to view the application.
+访问 [http://localhost:3000](http://localhost:3000)
 
-### Production Build
+### 生产构建
 
 ```bash
-# Build for production
 npm run build
-
-# Start production server
 npm start
 ```
 
-## 🛠️ Tech Stack
+## 🛠️ 技术栈
 
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
-- **Styling**: TailwindCSS v4
-- **UI Components**: shadcn/ui
-- **Icons**: Lucide React
-- **Visualization**:
-  - Recharts (2D Charts)
-  - Three.js + React Three Fiber (3D Rendering)
-  - Aceternity UI (Dither Shader)
-- **Motion**: Framer Motion
-- **Data Processing**: SheetJS (xlsx)
+- **框架**: Next.js 16 (App Router)
+- **语言**: TypeScript
+- **样式**: TailwindCSS v4
+- **UI 组件**: shadcn/ui
+- **图表**: Recharts
+- **3D 可视化**: Three.js + React Three Fiber
+- **数据处理**: SheetJS (xlsx)
 
-## 📁 Project Structure
+## 📁 项目结构
 
 ```
 src/
-├── app/                    # App Router pages
-│   ├── layout.tsx         # Root layout
-│   ├── page.tsx           # Homepage (Landing)
-│   ├── image-to-points/   # Image analysis module
-│   └── points-to-image/   # Point cloud reconstruction module
-├── components/            # React components
-│   ├── ui/               # Reusable shadcn/ui components
-│   ├── three/            # 3D visualization components
-│   ├── dither-shader.tsx # Dither effect component
-│   └── navigation.tsx    # Global navigation
-├── lib/                  # Utilities and hooks
-│   ├── i18n-context.tsx  # Internationalization
-│   └── processing.ts     # Image processing algorithms
-└── public/               # Static assets
+├── app/                    # 页面路由
+│   ├── layout.tsx         # 根布局
+│   ├── page.tsx           # 首页
+│   ├── image-to-points/   # 图片转点云模块
+│   └── points-to-image/   # 点云转图片模块
+├── components/            # UI 组件
+│   ├── ui/               # shadcn/ui 组件
+│   ├── file-upload.tsx   # 文件上传
+│   ├── histogram-chart.tsx # 直方图
+│   ├── image-canvas.tsx  # 交互画布
+│   ├── three-d-viewer.tsx # 3D 可视化
+│   ├── navigation.tsx    # 导航栏
+│   └── theme-provider.tsx # 主题切换
+└── lib/                  # 工具函数
+    ├── image-processing.ts # 图像处理
+    ├── point-cloud.ts    # 点云处理
+    ├── excel-utils.ts    # 导出功能
+    └── utils.ts          # 辅助函数
 ```
 
-## 📊 Data Formats
+## 📊 数据格式
 
-### Point Cloud Import/Export (CSV)
-
-The application expects or generates CSV files with the following structure:
+### 点云导出格式
 
 ```csv
 X,Y,Grayscale
@@ -115,36 +87,59 @@ X,Y,Grayscale
 0,1,64
 ```
 
-- **X**: Horizontal coordinate (pixel column)
-- **Y**: Vertical coordinate (pixel row, bottom-up mathematical coordinates)
-- **Grayscale**: Intensity value (0-255)
+**说明**:
+- X: 水平坐标
+- Y: 垂直坐标（数学坐标系，从下到上）
+- Grayscale: 灰度值 (0-255)
 
-## 🎨 Key Highlights
+## 🎨 特性
 
-- ✅ **Responsive Design**: Optimized for desktop and mobile interactions.
-- ✅ **Theme Support**: Seamless Dark/Light mode switching (System default).
-- ✅ **Privacy Focused**: All processing happens client-side in the browser.
-- ✅ **Internationalization**: Bilingual support (English / Chinese).
+- ✅ 响应式设计（支持桌面和移动端）
+- ✅ 暗色/亮色主题切换
+- ✅ 触摸手势支持
+- ✅ 拖拽上传文件
+- ✅ 实时数据可视化
+- ✅ 多种导出格式
+- ✅ 3D 表面可视化
 
-## 📝 Usage Workflows
+## 📝 使用说明
 
-### Image → Point Cloud
+### Image → Points 工作流
 
-1. **Upload**: Select an image file.
-2. **Analyze**: Use mouse to draw regions on the canvas.
-3. **View Stats**: Check histograms and statistical metrics for selected regions.
-4. **Export**: Save the pixel data as a standardized CSV point cloud.
+1. 上传图片（PNG、JPG、JPEG）
+2. 在灰度图上绘制矩形选择分析区域
+3. 查看每个区域的直方图和统计数据
+4. 导出点云数据或分析结果
 
-### 3D Visualization
+### Points → Image 工作流
 
-1. **Import**: Upload a valid CSV point cloud file.
-2. **Render**: The system automatically reconstructs the 2D image and generates a 3D terrain map.
-3. **Interact**: Rotate, zoom, and pan the 3D view. Toggle grid or change render modes.
+1. 上传包含 X、Y、Grayscale 列的 CSV/Excel 文件
+2. 查看生成的 2D 灰度图像
+3. 切换到 3D 视图查看表面可视化
+4. 下载生成的图像
 
-## 🤝 Contribution
+## 🔧 开发
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### 代码规范
 
-## � License
+```bash
+npm run lint
+```
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+### 类型检查
+
+```bash
+npm run type-check
+```
+
+## 📄 许可证
+
+MIT License
+
+## 🤝 贡献
+
+欢迎提交 Pull Request 或 Issue！
+
+## 📞 联系方式
+
+如有问题或建议，请创建 Issue。
