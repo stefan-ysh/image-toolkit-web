@@ -27,6 +27,7 @@ import {
 } from '@/lib/image-processing';
 
 import { exportToCSV, exportToExcel, exportAnalysisToExcel, exportSeparateFiles, saveImage } from '@/lib/excel-utils';
+import { parsePointCloudFile, convertToImage } from '@/lib/point-cloud';
 import { useI18n } from '@/lib/i18n-context';
 
 export default function ImageToPointsPage() {
