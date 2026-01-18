@@ -414,7 +414,7 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
                     size="icon"
                     className={`h-8 w-8 text-white hover:bg-white/20 active:bg-white/30 ${autoRotate ? 'bg-white/20' : ''}`}
                     onClick={() => setAutoRotate(!autoRotate)}
-                    title={t ? t('3d.rotate') : "Auto Rotate"}
+                    title={t('3d.rotate')}
                 >
                     {autoRotate ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                 </Button>
@@ -424,7 +424,7 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
                     size="icon"
                     className="h-8 w-8 text-white hover:bg-white/20 active:bg-white/30"
                     onClick={toggleRenderMode}
-                    title={t ? `${t('3d.mode')}: ${renderMode}` : `Mode: ${renderMode}`}
+                    title={`${t('3d.mode')}: ${renderMode}`}
                 >
                     {renderMode === 'points' ? <CircleDot className="h-4 w-4" /> :
                         renderMode === 'wireframe' ? <Grid3X3 className="h-4 w-4" /> :
@@ -441,7 +441,7 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
                         const nextIndex = (currentIndex + 1) % maps.length;
                         setColorMap(maps[nextIndex]);
                     }}
-                    title={t ? `${t('3d.colormap')}: ${colorMap}` : `Color Map: ${colorMap}`}
+                    title={`${t('3d.colormap')}: ${colorMap}`}
                 >
                     <Palette className="h-4 w-4" />
                 </Button>
@@ -451,7 +451,7 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
                     size="icon"
                     className={`h-8 w-8 text-white hover:bg-white/20 active:bg-white/30 ${isPulsing ? 'bg-white/20' : ''}`}
                     onClick={togglePulse}
-                    title={t ? t('3d.pulse') : "Animate Pulse"}
+                    title={t('3d.pulse')}
                 >
                     <Activity className="h-4 w-4" />
                 </Button>
@@ -461,7 +461,7 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
                     size="icon"
                     className="h-8 w-8 text-white hover:bg-white/20 active:bg-white/30"
                     onClick={takeScreenshot}
-                    title={t ? t('3d.screenshot') : "Take Screenshot"}
+                    title={t('3d.screenshot')}
                 >
                     <Camera className="h-4 w-4" />
                 </Button>
@@ -471,7 +471,7 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
                     size="icon"
                     className="h-8 w-8 text-white hover:bg-white/20 active:bg-white/30"
                     onClick={handleExportOBJ}
-                    title={t ? "Export OBJ" : "Export 3D Model"}
+                    title={t('3d.export')}
                 >
                     <FileDown className="h-4 w-4" />
                 </Button>
@@ -489,7 +489,7 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
                         // A true camera reset requires access to OrbitControls ref
                         window.dispatchEvent(new Event('trigger-camera-reset'));
                     }}
-                    title={t ? t('3d.reset') : "Reset View"}
+                    title={t('3d.reset')}
                 >
                     <RotateCcw className="h-4 w-4" />
                 </Button>
@@ -501,7 +501,7 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
 
             <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2 w-32 pointer-events-auto bg-black/50 p-2 rounded-lg backdrop-blur-sm">
                 <div className="text-[10px] text-muted-foreground flex justify-between w-full">
-                    <span>{t ? t('3d.height') : "Height Scale"}</span>
+                    <span>{t('3d.height')}</span>
                     <span>{heightScale.toFixed(1)}</span>
                 </div>
                 <Slider
