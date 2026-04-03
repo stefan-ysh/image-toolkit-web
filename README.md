@@ -10,24 +10,23 @@ A modern web application for advanced image processing, quantitative analysis, a
 
 ### 📸 Image Processing & Analysis
 
-- **Format Support**: Drag & drop support for PNG, JPG, JPEG, and RAW formats.
-- **Grayscale Conversion**: High-precision algorithms for linear normalization and auto-calibration.
+- **Format Support**: Drag & drop support for PNG, JPG, JPEG, CSV, and Excel point cloud files.
+- **Grayscale Conversion**: Browser-side grayscale conversion for uploaded images.
 - **Region Analysis**: Interactive rectangular selection tools for targeted area analysis.
 - **Quantitative Data**: Real-time histogram generation, pixel distribution statistics, and profiling.
 - **Data Export**: Export analysis results to CSV or Excel formats for external processing.
 
 ### 🎨 Pixel Art & Dither Effects
 
-- **Real-time Dithering**: Apply ordered dithering effects (Bayer, Halftone, Noise, Crosshatch).
-- **Color Modes**: Support for Grayscale, Duotone, and Custom Palettes.
-- **Animation**: Dynamic grid size breathing effects and animated noise patterns.
+- **Landing Showcase**: A real-time Bayer dither preview on the homepage.
+- **Animation**: Dynamic grid size breathing effect for the showcase.
 
 ### 🔄 Point Cloud & 3D Visualization
 
 - **Data Import**: Reconstruct images from CSV/Excel point cloud data (X, Y, Grayscale).
 - **3D Rendering**: Interactive 3D surface visualization using Three.js and React Three Fiber.
 - **View Controls**: Adjustable height scaling, color mapping, pulse animation, and auto-rotation.
-- **Export**: Download reconstructed 2D images or 3D view snapshots.
+- **Export**: Download grayscale images, point cloud tables, analysis workbooks, or 3D view snapshots.
 
 ## 🚀 Getting Started
 
@@ -70,7 +69,7 @@ npm start
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Next.js 15 (App Router)
+- **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
 - **Styling**: TailwindCSS v4
 - **UI Components**: shadcn/ui
@@ -89,16 +88,17 @@ src/
 ├── app/                    # App Router pages
 │   ├── layout.tsx         # Root layout
 │   ├── page.tsx           # Homepage (Landing)
-│   ├── image-to-points/   # Image analysis module
-│   └── points-to-image/   # Point cloud reconstruction module
+│   └── image-to-points/   # Unified image analysis and point cloud reconstruction module
 ├── components/            # React components
 │   ├── ui/               # Reusable shadcn/ui components
-│   ├── three/            # 3D visualization components
-│   ├── dither-shader.tsx # Dither effect component
+│   ├── image-canvas.tsx  # Region drawing canvas
+│   ├── three-d-viewer.tsx # 3D visualization
 │   └── navigation.tsx    # Global navigation
 ├── lib/                  # Utilities and hooks
 │   ├── i18n-context.tsx  # Internationalization
-│   └── processing.ts     # Image processing algorithms
+│   ├── image-processing.ts
+│   ├── point-cloud.ts
+│   └── excel-utils.ts
 └── public/               # Static assets
 ```
 
@@ -121,7 +121,7 @@ X,Y,Grayscale
 
 ## 🎨 Key Highlights
 
-- ✅ **Responsive Design**: Optimized for desktop and mobile interactions.
+- ✅ **Responsive Layout**: Core pages scale down to tablet/mobile widths.
 - ✅ **Theme Support**: Seamless Dark/Light mode switching (System default).
 - ✅ **Privacy Focused**: All processing happens client-side in the browser.
 - ✅ **Internationalization**: Bilingual support (English / Chinese).
@@ -145,6 +145,6 @@ X,Y,Grayscale
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## � License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.

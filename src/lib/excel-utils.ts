@@ -61,6 +61,7 @@ export function exportToExcel(
             X: point.x,
             Y: point.y,
             Grayscale: point.grayscale,
+            ...(includeRegion ? { Region: point.region || '' } : {}),
         }));
         const ws = XLSX.utils.json_to_sheet(wsData);
         XLSX.utils.book_append_sheet(wb, ws, 'Point Cloud');
@@ -73,6 +74,7 @@ export function exportToExcel(
                 X: point.x,
                 Y: point.y,
                 Grayscale: point.grayscale,
+                ...(includeRegion ? { Region: point.region || regionId } : {}),
             }));
             const ws = XLSX.utils.json_to_sheet(wsData);
             // Clean sheet name for Excel compatibility

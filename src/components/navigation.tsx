@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Home } from 'lucide-react';
+import { Home, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-provider';
 import { Button } from './ui/button';
@@ -12,15 +13,15 @@ export function Navigation() {
     const pathname = usePathname();
     const { t, language, setLanguage } = useI18n();
 
-    const navItems: { href: string; label: string; icon: any }[] = [
-        // { href: '/', label: t('nav.home'), icon: Home },
+    const navItems: { href: string; label: string; icon: LucideIcon }[] = [
+        { href: '/', label: t('nav.home'), icon: Home },
     ];
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-14 max-w-screen-2xl items-center px-4">
                 <Link href="/" className="mr-6 flex items-center space-x-2">
-                    <img src="/logo.png" alt="Logo" className="h-6 w-6" />
+                    <Image src="/logo.png" alt="Logo" width={24} height={24} className="h-6 w-6" />
                     <span className="hidden font-bold sm:inline-block">
                         Image Toolkit
                     </span>

@@ -29,7 +29,7 @@ interface HistogramChartProps {
 }
 
 export function HistogramChart({
-    data: _histogramData, // Unused
+    data,
     profileData,
     stats,
     title = 'Pixel Values',
@@ -38,6 +38,7 @@ export function HistogramChart({
     chartType = 'scatter',
     t,
 }: HistogramChartProps) {
+    void data;
 
     // Profile data: array of { index, value }
     // Aggressive downsampling for performance (max 500 points for scatter)
@@ -75,7 +76,7 @@ export function HistogramChart({
                     </div>
                 )}
                 {/* Min-height constraint to prevent resize loop error */}
-                <div className="h-[280px] w-full min-h-[200px] min-w-[200px]">
+                <div className="h-[220px] w-full min-h-[180px] min-w-0 sm:h-[280px] sm:min-h-[200px]">
                     <ResponsiveContainer width="100%" height="100%">
                         {chartType === 'scatter' ? (
                             <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
@@ -115,9 +116,6 @@ export function HistogramChart({
                                     data={displayData}
                                     fill="#60a5fa"
                                     isAnimationActive={false}
-                                    shape={(props: any) => (
-                                        <circle cx={props.cx} cy={props.cy} r={1.5} fill="#60a5fa" />
-                                    )}
                                 />
                                 {stats && (
                                     <>
@@ -179,7 +177,7 @@ export function HistogramChart({
 
                 {/* Statistics Grid */}
                 {stats && (
-                    <div className="grid grid-cols-3 gap-2 mt-4 text-center">
+                    <div className="mt-4 grid grid-cols-2 gap-2 text-center sm:grid-cols-3">
                         <StatBox label={t ? t('i2p.stats.mean') : "Mean"} value={stats.mean.toFixed(1)} />
                         <StatBox label={t ? t('i2p.stats.stdDev') : "Std Dev"} value={stats.std.toFixed(1)} />
                         <StatBox label={t ? t('i2p.stats.median') : "Median"} value={stats.median.toFixed(1)} />
@@ -195,7 +193,7 @@ export function HistogramChart({
 
 function StatBox({ label, value }: { label: string; value: string }) {
     return (
-        <div className="p-2 rounded-lg bg-muted/50">
+        <div className="rounded-lg bg-muted/50 p-2">
             <p className="text-xs text-muted-foreground">{label}</p>
             <p className="text-sm font-semibold text-foreground">{value}</p>
         </div>

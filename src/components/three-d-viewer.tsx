@@ -1,6 +1,6 @@
-import { useRef, useMemo, useState, useEffect } from 'react';
+import { useRef, useMemo, useState, useEffect, type ComponentRef } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n-context';
@@ -36,6 +36,8 @@ interface SurfaceProps {
     colorMap: ColorMapType;
     isPulsing: boolean;
 }
+
+type OrbitControlsHandle = ComponentRef<typeof OrbitControls>;
 
 function getColor(value: number, map: ColorMapType): [number, number, number] {
     // value is 0-1
@@ -192,6 +194,12 @@ function Surface({ imageData, renderMode, heightScale, colorMap, isPulsing }: Su
         return { geometry: geo };
     }, [imageData, heightScale, colorMap]);
 
+    useEffect(() => {
+        return () => {
+            geometry.dispose();
+        };
+    }, [geometry]);
+
     if (renderMode === 'points') {
         return (
             <points ref={pointsRef} geometry={geometry}>
@@ -218,8 +226,18 @@ function Surface({ imageData, renderMode, heightScale, colorMap, isPulsing }: Su
     );
 }
 
-function SceneContent({ imageData, renderMode, heightScale, colorMap, isPulsing }: SurfaceProps) {
+function SceneContent({ imageData, renderMode, heightScale, colorMap, isPulsing, autoRotate, controlsRef }: SurfaceProps & {
+    autoRotate: boolean;
+    controlsRef: React.RefObject<OrbitControlsHandle | null>;
+}) {
     const { gl, scene, camera } = useThree();
+    const starPositions = useMemo(
+        () =>
+            new Float32Array(
+                Array.from({ length: 1500 }, (_, index) => Math.sin(index * 12.9898) * 5)
+            ),
+        []
+    );
 
     // Custom screenshot function attached to window/event for access from UI
     useEffect(() => {
@@ -262,13 +280,14 @@ function SceneContent({ imageData, renderMode, heightScale, colorMap, isPulsing 
     return (
         <>
             <OrbitControls
+                ref={controlsRef}
                 enablePan={true}
                 enableZoom={true}
                 enableRotate={true}
-                autoRotate={false}
+                autoRotate={autoRotate}
                 autoRotateSpeed={2.0}
-                minDistance={1}
-                maxDistance={10}
+                minDistance={0.5}
+                maxDistance={8}
             />
             <ambientLight intensity={0.5} />
             <pointLight position={[10, 10, 10]} intensity={1} />
@@ -281,7 +300,7 @@ function SceneContent({ imageData, renderMode, heightScale, colorMap, isPulsing 
                     <bufferGeometry>
                         <bufferAttribute
                             attach="attributes-position"
-                            args={[new Float32Array(Array.from({ length: 1500 }, () => (Math.random() - 0.5) * 10)), 3]}
+                            args={[starPositions, 3]}
                         />
                     </bufferGeometry>
                     <pointsMaterial size={0.02} color="#ffffff" transparent opacity={0.4} />
@@ -305,7 +324,6 @@ function SceneContent({ imageData, renderMode, heightScale, colorMap, isPulsing 
 
 function AutoFitCamera({ imageData }: { imageData: ImageData }) {
     const { camera, size } = useThree();
-    const controls = useRef<any>(null); // We don't have access to the main controls ref here easily without context, but we can manipulate camera directly.
 
     useEffect(() => {
         if (!imageData) return;
@@ -351,6 +369,7 @@ function AutoFitCamera({ imageData }: { imageData: ImageData }) {
 
 export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
     const { t } = useI18n();
+    const controlsRef = useRef<OrbitControlsHandle | null>(null);
     const [renderMode, setRenderMode] = useState<RenderMode>('surface');
     const [autoRotate, setAutoRotate] = useState(false);
     const [heightScale, setHeightScale] = useState(0.5);
@@ -399,7 +418,7 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
     return (
         <div className={`${isFullScreen 
             ? 'fixed inset-0 z-[100] w-screen h-screen rounded-none' 
-            : `relative rounded-lg overflow-hidden h-full ${className}`} bg-neutral-900 group transition-all duration-300`}>
+            : `relative rounded-lg overflow-hidden h-full min-h-[280px] ${className}`} bg-neutral-900 group transition-all duration-300`}>
             <Canvas
                 gl={{ preserveDrawingBuffer: true }} // Required for screenshot
                 camera={{ position: [0, 0, 2.2], fov: 50 }}
@@ -410,20 +429,13 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
                     heightScale={heightScale}
                     colorMap={colorMap}
                     isPulsing={isPulsing}
+                    autoRotate={autoRotate}
+                    controlsRef={controlsRef}
                 />
-
-                {/* Auto-rotate effect needs to be applied to OrbitControls which is now inside SceneContent 
-                    For simplicity, we can just use the prop on OrbitControls directly if we lift it, 
-                    OR we can make a wrapper. Let's handle auto-rotate simply via a ref if needed, 
-                    but standard OrbitControls autoRotate prop works fine if state is passed down.
-                    Wait, SceneContent uses locally instantiated OrbitControls. 
-                    Let's pass autoRotate down to SceneContent.
-                */}
-                <ControlsWrapper autoRotate={autoRotate} />
             </Canvas>
 
             {/* Controls Overlay */}
-            <div className="absolute top-4 right-4 flex flex-col gap-2 p-2 bg-black/50 backdrop-blur-sm rounded-lg border border-white/10 transition-opacity">
+            <div className="absolute left-3 right-3 top-3 flex flex-wrap justify-center gap-2 p-2 sm:left-auto sm:right-4 sm:flex-col sm:justify-start bg-black/55 backdrop-blur-sm rounded-lg border border-white/10 transition-opacity">
                 <Button
                     variant="ghost"
                     size="icon"
@@ -511,8 +523,7 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
                         setAutoRotate(false);
                         setRenderMode('surface');
                         setIsPulsing(false);
-                        // A true camera reset requires access to OrbitControls ref
-                        window.dispatchEvent(new Event('trigger-camera-reset'));
+                        controlsRef.current?.reset();
                     }}
                     title={t('3d.reset')}
                 >
@@ -520,12 +531,12 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
                 </Button>
             </div>
 
-            <div className="absolute bottom-2 left-2 text-xs text-muted-foreground bg-black/50 px-2 py-1 rounded pointer-events-none">
+            <div className="absolute bottom-2 left-2 hidden rounded bg-black/50 px-2 py-1 text-xs text-muted-foreground pointer-events-none sm:block">
                 LMB: Rotate • Wheel: Zoom • RMB: Pan
             </div>
 
-            <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2 w-32 pointer-events-auto bg-black/50 p-2 rounded-lg backdrop-blur-sm">
-                <div className="text-[10px] text-muted-foreground flex justify-between w-full">
+            <div className="absolute bottom-3 left-3 right-3 flex flex-col items-stretch gap-2 rounded-lg bg-black/55 p-2 backdrop-blur-sm sm:left-auto sm:right-4 sm:w-32 sm:items-end pointer-events-auto">
+                <div className="flex w-full justify-between text-[10px] text-muted-foreground">
                     <span>{t('3d.height')}</span>
                     <span>{heightScale.toFixed(1)}</span>
                 </div>
@@ -540,41 +551,5 @@ export function ThreeDViewer({ imageData, className }: ThreeDViewerProps) {
                 />
             </div>
         </div>
-    );
-}
-
-// Helper component to handle controls logic
-function ControlsWrapper({ autoRotate }: { autoRotate: boolean }) {
-    const controlsRef = useRef<any>(null);
-
-    useEffect(() => {
-        const handleReset = () => {
-            controlsRef.current?.reset();
-        };
-        const handleResetTarget = () => {
-            if (controlsRef.current) {
-                controlsRef.current.target.set(0, 0, 0);
-                controlsRef.current.update();
-            }
-        };
-        window.addEventListener('trigger-camera-reset', handleReset);
-        window.addEventListener('reset-controls-target', handleResetTarget);
-        return () => {
-            window.removeEventListener('trigger-camera-reset', handleReset);
-            window.removeEventListener('reset-controls-target', handleResetTarget);
-        };
-    }, []);
-
-    return (
-        <OrbitControls
-            ref={controlsRef}
-            enablePan={true}
-            enableZoom={true}
-            enableRotate={true}
-            autoRotate={autoRotate}
-            autoRotateSpeed={2.0}
-            minDistance={0.5}
-            maxDistance={8}
-        />
     );
 }

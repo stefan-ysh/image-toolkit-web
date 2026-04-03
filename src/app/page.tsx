@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   Scan,
   Activity,
   Box,
   ArrowRight,
-  Binary,
   Sparkles,
 } from "lucide-react";
 import { DitherShader } from "@/components/ui/dither-shader";
@@ -89,98 +89,11 @@ export default function HomePage() {
         }}
       />
 
-      {/* Animated Gradient Orbs */}
-      <motion.div
-        className="absolute top-20 -left-32 w-96 h-96 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/10 blur-3xl"
-        animate={{
-          x: [0, 50, 0],
-          y: [0, 30, 0],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="absolute bottom-40 -right-32 w-80 h-80 rounded-full bg-gradient-to-br from-cyan-500/15 to-blue-500/10 blur-3xl"
-        animate={{
-          x: [0, -40, 0],
-          y: [0, -50, 0],
-          scale: [1, 1.2, 1],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-cyan-500/5 to-transparent blur-3xl"
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{
-          duration: 6,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
-      {/* Floating Particles */}
-      {[...Array(6)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 rounded-full bg-cyan-400/60"
-          style={{
-            left: `${15 + i * 15}%`,
-            top: `${20 + (i % 3) * 25}%`,
-          }}
-          animate={{
-            y: [0, -30, 0],
-            opacity: [0.3, 0.8, 0.3],
-            scale: [1, 1.5, 1],
-          }}
-          transition={{
-            duration: 3 + i * 0.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: i * 0.3,
-          }}
-        />
-      ))}
-
-      {/* Animated Lines */}
-      <motion.div
-        className="absolute top-32 right-20 w-px h-32 bg-gradient-to-b from-transparent via-cyan-500/30 to-transparent"
-        animate={{
-          opacity: [0, 1, 0],
-          scaleY: [0.5, 1, 0.5],
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="absolute bottom-48 left-32 w-px h-24 bg-gradient-to-b from-transparent via-purple-500/30 to-transparent"
-        animate={{
-          opacity: [0, 1, 0],
-          scaleY: [0.5, 1, 0.5],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 1,
-        }}
-      />
+      <div className="absolute -left-24 top-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+      <div className="absolute bottom-16 right-0 h-64 w-64 rounded-full bg-chart-2/10 blur-3xl" />
 
       <div className="container max-w-screen-xl mx-auto px-4 py-16 md:py-24 relative z-10">
-        {/* Academic Header Section */}
+        {/* Header Section */}
         <motion.div
           className="max-w-4xl mx-auto text-center mb-16 md:mb-24"
           initial="hidden"
@@ -189,29 +102,19 @@ export default function HomePage() {
         >
           <motion.div
             variants={fadeInUp}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/50 border border-secondary text-secondary-foreground text-xs font-mono mb-6 tracking-wider uppercase"
+            className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/80 px-3 py-1 text-xs font-mono mb-6 tracking-wider uppercase"
           >
-            <img src="/logo.png" alt="Logo" className="w-4 h-4 mr-1" />
-            v2.0.0 | Research Edition
+            <Image src="/logo.png" alt="Logo" width={16} height={16} className="w-4 h-4 mr-1" />
+            Browser Image Analysis Toolkit
           </motion.div>
 
           <motion.h1
             variants={fadeInUp}
             className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 font-serif"
           >
-            <motion.span
-              className="bg-gradient-to-r from-foreground via-cyan-500 to-foreground bg-[length:200%_auto] bg-clip-text text-transparent"
-              animate={{
-                backgroundPosition: ["0% center", "200% center"],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            >
+            <span className="inline-block border-b border-primary/30 pb-2">
               {t("home.hero.title")}
-            </motion.span>
+            </span>
           </motion.h1>
 
           <motion.p
@@ -334,12 +237,12 @@ export default function HomePage() {
             </p>
             <ul className="text-xs text-muted-foreground space-y-2 mt-4 font-mono">
               <li className="flex items-center gap-2">
-                • RAW / PNG / JPG Support
+                • PNG / JPG / CSV / XLSX
               </li>
               <li className="flex items-center gap-2">
-                • Linear Normalization
+                • Browser-side grayscale conversion
               </li>
-              <li className="flex items-center gap-2">• Auto-Calibration</li>
+              <li className="flex items-center gap-2">• Source summary & file metadata</li>
             </ul>
           </motion.div>
 
@@ -358,12 +261,12 @@ export default function HomePage() {
             </p>
             <ul className="text-xs text-muted-foreground space-y-2 mt-4 font-mono">
               <li className="flex items-center gap-2">
-                • Histogram Generation
+                • Draw and edit rectangular regions
               </li>
               <li className="flex items-center gap-2">
-                • Statistical Distribution
+                • Histogram & grayscale distribution
               </li>
-              <li className="flex items-center gap-2">• Pixel Profiling</li>
+              <li className="flex items-center gap-2">• Numeric ROI adjustment</li>
             </ul>
           </motion.div>
 
@@ -382,11 +285,11 @@ export default function HomePage() {
             </p>
             <ul className="text-xs text-muted-foreground space-y-2 mt-4 font-mono">
               <li className="flex items-center gap-2">
-                • Point Cloud Generation
+                • Region-based 3D preview
               </li>
-              <li className="flex items-center gap-2">• Height Map Scaling</li>
+              <li className="flex items-center gap-2">• Height scaling & color maps</li>
               <li className="flex items-center gap-2">
-                • Interactive Viewport
+                • Excel export and OBJ snapshot
               </li>
             </ul>
           </motion.div>
@@ -404,8 +307,8 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold font-serif mb-2">
               {t("common.title")}
             </h2>
-            <p className="text-muted-foreground text-sm font-mono">
-              SYSTEM_MODULE: WORKBENCH_CORE
+            <p className="text-muted-foreground text-sm max-w-xl mx-auto">
+              Upload an image or point cloud, inspect regions, review charts, and export structured results from one workspace.
             </p>
           </motion.div>
 
@@ -447,15 +350,15 @@ export default function HomePage() {
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       <div className="p-4 bg-background border border-border rounded-sm">
                         <h4 className="font-mono text-xs text-muted-foreground mb-2 uppercase tracking-wider">
-                          {t("home.stats.grayLevels")}
+                          Input
                         </h4>
-                        <span className="text-2xl font-bold">256</span>
+                        <span className="text-2xl font-bold">PNG / CSV</span>
                       </div>
                       <div className="p-4 bg-background border border-border rounded-sm">
                         <h4 className="font-mono text-xs text-muted-foreground mb-2 uppercase tracking-wider">
-                          {t("home.stats.3dView")}
+                          Output
                         </h4>
-                        <span className="text-2xl font-bold">WebGL</span>
+                        <span className="text-2xl font-bold">XLSX / 3D</span>
                       </div>
                     </div>
                     <Button
@@ -479,9 +382,9 @@ export default function HomePage() {
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
         >
-          <p>© 2024 Image Analysis Platform. Academic License.</p>
+          <p>© 2024 Image Toolkit Web.</p>
           <p className="mt-2">
-            Developed for quantitative research and educational visualization.
+            Built for lightweight browser-based grayscale analysis and point cloud inspection.
           </p>
         </motion.div>
       </div>

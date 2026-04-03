@@ -13,6 +13,7 @@ interface FileUploadProps {
     description?: string;
     icon?: React.ReactNode;
     isLoading?: boolean;
+    supportedFormats?: string;
 }
 
 export function FileUpload({
@@ -23,12 +24,11 @@ export function FileUpload({
     description,
     icon,
     isLoading = false,
+    supportedFormats = 'PNG, JPG, JPEG',
 }: FileUploadProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const { t } = useI18n();
-
-    const defaultDescription = t('comp.upload.dragDrop');
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -138,7 +138,7 @@ export function FileUpload({
                         </p>
 
                         <p className="text-xs text-muted-foreground">
-                            {t('comp.upload.supports')}: PNG, JPG, JPEG
+                            {t('comp.upload.supports')}: {supportedFormats}
                         </p>
                     </div>
 

@@ -3,7 +3,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import type { Region } from '@/lib/image-processing';
 import { cn } from '@/lib/utils';
-import { X } from 'lucide-react';
 import { useI18n } from '@/lib/i18n-context';
 
 interface ImageCanvasProps {
@@ -67,10 +66,7 @@ export function ImageCanvas({
 
     // Load image
     useEffect(() => {
-        if (!imageSrc) {
-            setImage(null);
-            return;
-        }
+        if (!imageSrc) return;
         const img = new Image();
         img.onload = () => {
             setImage(img);
@@ -149,7 +145,7 @@ export function ImageCanvas({
         ctx.fillStyle = '#1a1a1a';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        if (!image) {
+        if (!imageSrc || !image || image.src !== imageSrc) {
             ctx.fillStyle = '#444';
             ctx.font = '16px sans-serif';
             ctx.textAlign = 'center';
@@ -220,7 +216,7 @@ export function ImageCanvas({
             ctx.strokeRect(rx, ry, rw, rh);
         }
 
-    }, [image, regions, selectedRegionId, interactionMode, startPoint, originalRegionValues, scale, offset, readonly, getDisplayMetrics, getResizeHandleRects]);
+    }, [image, imageSrc, regions, selectedRegionId, interactionMode, startPoint, originalRegionValues, readonly, getDisplayMetrics, getResizeHandleRects]);
 
     useEffect(() => {
         requestAnimationFrame(draw);
@@ -404,7 +400,7 @@ export function ImageCanvas({
             onRegionsChange(updatedRegions);
         }
 
-    }, [interactionMode, startPoint, originalRegionValues, image, cursor, regions, selectedRegionId, activeHandle, getDisplayMetrics, canvasToImage, getResizeHandleRects, onRegionsChange, readonly]);
+    }, [interactionMode, startPoint, originalRegionValues, image, regions, selectedRegionId, activeHandle, getDisplayMetrics, canvasToImage, getResizeHandleRects, onRegionsChange, readonly]);
 
     const handleMouseUp = useCallback(() => {
         if (interactionMode === 'drawing' && originalRegionValues) {

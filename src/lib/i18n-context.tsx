@@ -1,8 +1,9 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 
 type Language = 'en' | 'zh';
+const LANGUAGE_STORAGE_KEY = 'image-toolkit-language';
 
 interface Translations {
     [key: string]: {
@@ -44,10 +45,16 @@ const translations: Translations = {
     'i2p.upload.title': { en: 'Upload Image', zh: '上传图像' },
     'i2p.upload.desc': { en: 'Drag and drop or click to upload', zh: '拖放或点击上传' },
     'i2p.upload.cardDesc': { en: 'Select an image to convert to grayscale', zh: '选择需转换的图像' },
+    'i2p.upload.emptyTitle': { en: 'Start With an Image or Point Cloud', zh: '从图像或点云开始' },
+    'i2p.upload.emptyDesc': { en: 'This workspace handles grayscale conversion, region analysis, and 3D inspection in one flow.', zh: '这个工作台将灰度转换、区域分析和 3D 检视整合到同一条流程中。' },
+    'i2p.upload.emptyStep1': { en: 'Upload a photo or CSV/XLSX point cloud file.', zh: '上传图片或 CSV/XLSX 点云文件。' },
+    'i2p.upload.emptyStep2': { en: 'Draw or edit regions to inspect key areas.', zh: '绘制或编辑区域以检查关键位置。' },
+    'i2p.upload.emptyStep3': { en: 'Review charts, 3D preview, and export the results.', zh: '查看图表、3D 预览并导出结果。' },
     'i2p.grayscale.title': { en: 'Grayscale Image', zh: '灰度图像' },
     'i2p.grayscale.desc': { en: 'Region selection and analysis', zh: '区域选择与分析' },
     'i2p.common.save': { en: 'Save', zh: '保存' },
     'i2p.common.newImage': { en: 'New Image', zh: '新图像' },
+    'i2p.common.exporting': { en: 'Exporting...', zh: '导出中...' },
     'i2p.export.title': { en: 'Export Data', zh: '导出数据' },
     'i2p.regions.title': { en: 'Regions', zh: '区域' },
     'i2p.regions.desc': { en: 'Click regions on canvas to analyze', zh: '点击画布上的区域进行分析' },
@@ -55,11 +62,37 @@ const translations: Translations = {
     'i2p.region.label': { en: 'Region', zh: '区域' },
     'i2p.region.position': { en: 'Position', zh: '位置' },
     'i2p.region.size': { en: 'Size', zh: '尺寸' },
+    'i2p.region.editor.title': { en: 'Selected Region', zh: '当前区域' },
+    'i2p.region.editor.desc': { en: 'Adjust coordinates numerically for precise or mobile-friendly editing.', zh: '通过数值微调坐标，便于精确编辑和移动端操作。' },
+    'i2p.region.editor.empty': { en: 'Select a region to edit its coordinates and size.', zh: '选择一个区域后即可编辑其坐标和尺寸。' },
+    'i2p.region.editor.helper': { en: 'Changes update the canvas immediately. Re-run analysis after editing.', zh: '修改会立即同步到画布，编辑后请重新分析。' },
+    'i2p.region.editor.update': { en: 'Update Analysis', zh: '更新分析' },
+    'i2p.region.editor.x': { en: 'X', zh: 'X' },
+    'i2p.region.editor.y': { en: 'Y', zh: 'Y' },
+    'i2p.region.editor.width': { en: 'Width', zh: '宽度' },
+    'i2p.region.editor.height': { en: 'Height', zh: '高度' },
     'i2p.analysis.title': { en: 'Analysis Results', zh: '分析结果' },
     'i2p.analysis.noData': { en: 'No region selected. Draw a rectangle on the image to analyze.', zh: '未选择区域。在图像上绘制矩形进行分析。' },
     'i2p.export.excel': { en: 'Export Excel', zh: '导出 Excel' },
     'i2p.export.separate': { en: 'Export Separate Files', zh: '导出独立文件' },
+    'i2p.feedback.uploadError': { en: 'Failed to load file. Please check the file type and content.', zh: '文件加载失败，请检查文件类型和内容。' },
+    'i2p.feedback.noRegions': { en: 'Create at least one region before exporting analysis.', zh: '请至少创建一个区域后再导出分析。' },
+    'i2p.feedback.dismiss': { en: 'Dismiss', zh: '关闭' },
+    'i2p.feedback.exporting': { en: 'Exporting data...', zh: '正在导出数据...' },
+    'i2p.feedback.editPending': { en: 'Region updated. Run analysis again to refresh charts and 3D preview.', zh: '区域已更新，请重新分析以刷新图表和 3D 预览。' },
+    'i2p.feedback.uploadReady': { en: 'File loaded. You can draw regions or adjust values in the editor.', zh: '文件已载入，可以开始绘制区域或在编辑器中调整数值。' },
+    'i2p.quick.title': { en: 'Region Quick Access', zh: '区域快捷访问' },
+    'i2p.quick.desc': { en: 'Use these cards on smaller screens to jump between regions and actions quickly.', zh: '在小屏设备上可通过这些卡片快速切换区域和执行操作。' },
+    'i2p.quick.select': { en: 'Open', zh: '打开' },
+    'i2p.quick.delete': { en: 'Delete', zh: '删除' },
     'i2p.stats.region': { en: 'Region', zh: '区域' },
+    'i2p.meta.title': { en: 'Source Summary', zh: '源文件摘要' },
+    'i2p.meta.filename': { en: 'File', zh: '文件' },
+    'i2p.meta.type': { en: 'Type', zh: '类型' },
+    'i2p.meta.size': { en: 'Size', zh: '尺寸' },
+    'i2p.meta.points': { en: 'Points', zh: '点数' },
+    'i2p.meta.image': { en: 'Image', zh: '图像' },
+    'i2p.meta.pointCloud': { en: 'Point Cloud', zh: '点云' },
     'i2p.stats.mean': { en: 'Mean', zh: '平均值' },
     'i2p.stats.median': { en: 'Median', zh: '中位数' },
     'i2p.stats.stdDev': { en: 'Std Dev', zh: '标准差' },
@@ -129,12 +162,34 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-    const [language, setLanguage] = useState<Language>('zh'); // Default to Chinese as per request context implies Chinese user
+function getInitialLanguage(): Language {
+    if (typeof window === 'undefined') {
+        return 'zh';
+    }
 
-    const t = (key: string) => {
+    const storedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (storedLanguage === 'en' || storedLanguage === 'zh') {
+        return storedLanguage;
+    }
+
+    return window.navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+}
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+    const [language, setLanguageState] = useState<Language>(getInitialLanguage);
+
+    useEffect(() => {
+        window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+        document.documentElement.lang = language;
+    }, [language]);
+
+    const setLanguage = useCallback((lang: Language) => {
+        setLanguageState(lang);
+    }, []);
+
+    const t = useCallback((key: string) => {
         return translations[key]?.[language] || key;
-    };
+    }, [language]);
 
     return (
         <I18nContext.Provider value={{ language, setLanguage, t }}>

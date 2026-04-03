@@ -55,7 +55,7 @@ export function GrayscaleDistributionChart({
     return (
         <div className={`bg-muted/30 rounded-lg p-3 ${className || ''}`}>
             <p className="text-sm font-medium mb-2">{title}</p>
-            <div className="relative" style={{ width: '100%', height: 160 }}>
+            <div className="relative h-[140px] w-full sm:h-[160px]">
                 {isLoading && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/50 backdrop-blur-sm rounded-lg">
                         <div className="flex flex-col items-center gap-2">
@@ -109,4 +109,3 @@ export function GrayscaleDistributionChart({
         </div>
     );
 }
-
